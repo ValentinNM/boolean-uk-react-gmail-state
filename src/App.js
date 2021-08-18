@@ -2,22 +2,72 @@ import Header from './components/Header'
 
 import initialEmails from './data/emails'
 
+const filterUnreadEmails = emails => emails.filter(email => !email.read)
+
 import './App.css'
 import { useState } from 'react'
 
 function App() {
 
   const [emails, setEmails] = useState (initialEmails)
-  console.log("initial Emails: ", emails)
+  const [isHidingEmailsChecked, setisHidingEmailsChecked] = useState(false)
+  console.log("initial Emails: ", emails, 'isHidingEmailsChecked: ', isHidingEmailsChecked)
 
-  // const renderEmail = emails.map(email => <li className="email">{
+
+  const toggleRead = targetEmail => {
+    console.log("inside targetedEmail: ", targetEmail, emails)
+
+    const updatedEmails = emails.map(email => {
+      console.log("inside toggleRead map: ", email, targetEmail)
+      
+      if (email.id === targetEmail.id) {
+        console.log('Found email: ', email, targetEmail.read)
+ 
+        const updatedEmail = { 
+          ... targetEmail, 
+          read: !targetEmail.read
+        }
+        console.log('updatedEmail: ', updatedEmail)
+
+        return updatedEmail
+      } else {
+        return email
+      }
+    })
+    console.log(updatedEmails)
     
-  //   // {__html: email.sender },
-  //   // email.starred 
-  //   email.title
-    
-  //   }
-  //   </li> )
+    setEmails(updatedEmails)
+  } 
+
+  const toggleStarred = targetEmail => {
+    console.log("inside toggleStarred: ", targetEmail, emails)
+
+    const updatedEmails = emails.map (email => {
+      console.log('inside toggleStarred map: ', email, targetEmail)
+
+      if(email.id === targetEmail.id) { 
+        console.log('found Email:', email, targetEmail.starred)
+
+        const updatedEmail = { 
+          ... targetEmail, 
+          starred: !targetEmail.starred
+        }
+        console.log('updatedEmail: ', updatedEmail)
+
+        return updatedEmail
+      } else {
+        return email
+      }
+    })
+    console.log("updatedEmails: ", updatedEmails)
+    setEmails(updatedEmails)
+  }
+
+  let filteredEmails = emails
+
+  if (isHidingEmailsChecked) {
+    filteredEmails = filterUnreadEmails(emails)
+  } 
 
   return (
     <div className="app">
@@ -44,26 +94,28 @@ function App() {
             <input
               id="hide-read"
               type="checkbox"
-              checked={false}
-              // onChange={() => {}}
+              checked={isHidingEmailsChecked}
+              onChange={event => setisHidingEmailsChecked(event.target.checked)}
             />
           </li>
         </ul>
       </nav>
       <main className="emails">
         <ul>
-          {/* Render a list of emails here */
-      // renderEmail
+          {   /* Render a list of emails here */
+
+          } 
+          { filteredEmails.map(email => { 
 
       emails.map(email => {
         return (
-          <li className ="email read">
+          <li className = {email.read ? 'email read' : 'email'} >
             <div className = "select">
             <input
                     className="select-checkbox"
                     type="checkbox"
                     checked={email.read}
-                    onChange={() => {}}
+                    onChange={() => toggleRead(email)}
                     />
             </div>
 
@@ -72,7 +124,7 @@ function App() {
                     className="star-checkbox"
                     type="checkbox"
                     checked={email.starred}
-                    onChange={() => {}}
+                    onChange={() => toggleStarred(email)}
                     />
             </div>
 
@@ -86,10 +138,7 @@ function App() {
 
           </li>
         )
-        
-      })
-
-      }
+      })}
       </ul>
       </main>
     </div>
